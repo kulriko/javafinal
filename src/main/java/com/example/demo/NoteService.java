@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -14,7 +17,20 @@ public class NoteService {
         System.out.println(noteRepository.findAll().toString());
         return noteRepository.findAll();
     }
-    public Optional<Notes> findNoteByUser(String user){
-        return noteRepository.findNoteByUser(user);
+    public Optional<Notes> findNoteByUsername(String username){
+        return noteRepository.findNoteByUsername(username);
+    }
+    @Autowired
+    private MongoTemplate mongoTemplate;
+
+    public Notes createNote(String title, String content, String username){
+       Notes note = new Notes(title, content, username);
+       note = noteRepository.insert(note);
+        mongoTemplate.update(Notes.class)
+                            .matching(Criteria.where("username").is(username))
+                            .apply(new Update().push("_id").value(note.getId()))
+                            .first();
+
+        return note;
     }
 }

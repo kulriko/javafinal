@@ -19,11 +19,11 @@ public class Notes {
     private ObjectId id;
     private String title;
     private String content;
-    private String user;
+    private String username;
     
-    public Notes(String content, String user){
+    public Notes(String title, String content, String username){
         this.title = title;
         this.content = content;
-        this.user = user;
+        this.username = username;
     }
 }
