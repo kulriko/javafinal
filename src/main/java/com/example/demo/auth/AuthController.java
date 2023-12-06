@@ -17,6 +17,7 @@ import com.example.demo.jwt.LoginReq;
 import com.example.demo.jwt.LoginRes;
 import com.example.demo.jwt.RegisterReq;
 
+@CrossOrigin(origins = "http://localhost:8081")
 @Controller
 @RequestMapping("/rest/auth")
 public class AuthController {
@@ -31,7 +32,7 @@ public class AuthController {
         this.jwtUtil = jwtUtil;
         this.userRepository = userRepository;
     }
-
+    @CrossOrigin(origins = "http://localhost:8081")
     @ResponseBody
     @RequestMapping(value = "/login",method = RequestMethod.POST)
     public ResponseEntity login(@RequestBody LoginReq loginReq)  {
@@ -54,7 +55,7 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
     }
-    
+    @CrossOrigin(origins = "http://localhost:8081")
      @PostMapping("/register")
     public ResponseEntity register(@RequestBody RegisterReq registerReq) {
         try {

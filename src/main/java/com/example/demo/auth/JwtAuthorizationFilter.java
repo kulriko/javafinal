@@ -30,40 +30,45 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         this.jwtUtil = jwtUtil;
         this.mapper = mapper;
     }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         Map<String, Object> errorDetails = new HashMap<>();
 
         try {
             String accessToken = jwtUtil.resolveToken(request);
-            if (accessToken == null ) {
+
+            if (accessToken == null) {
                 filterChain.doFilter(request, response);
                 return;
             }
-            System.out.println("token : "+accessToken);
+
+            System.out.println("token: " + accessToken);
             Claims claims = jwtUtil.resolveClaims(request);
 
-            if(claims != null & jwtUtil.validateClaims(claims)){
+            if (claims != null && jwtUtil.validateClaims(claims)) {
                 String username = claims.getSubject();
-                System.out.println("username : "+username);
+                System.out.println("username: " + username);
                 Authentication authentication =
-                        new UsernamePasswordAuthenticationToken(username,"",new ArrayList<>());
+                        new UsernamePasswordAuthenticationToken(username, "", new ArrayList<>());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
+
             if (request.getRequestURI().equals("/rest/auth/register") && request.getMethod().equals("POST")) {
                 filterChain.doFilter(request, response);
                 return;
             }
 
-        }catch (Exception e){
+        } catch (Exception e) {
             errorDetails.put("message", "Authentication Error");
-            errorDetails.put("details",e.getMessage());
-            response.setStatus(HttpStatus.FORBIDDEN.value());
+            errorDetails.put("details", e.getMessage());
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
             mapper.writeValue(response.getWriter(), errorDetails);
-
+            return; // Przerwij dalsze przetwarzanie w przypadku błędu
         }
+
         filterChain.doFilter(request, response);
     }
 }
