@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
@@ -27,6 +28,9 @@ public class NoteService {
     private MongoTemplate mongoTemplate;
 
     public Notes createNote(String title, String content, String username) {
+        username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        // Tworzymy notatkę z przypisanym użytkownikiem
         Notes note = new Notes(title, content, username);
         return noteRepository.insert(note);
     }
