@@ -26,14 +26,9 @@ public class NoteService {
     @Autowired
     private MongoTemplate mongoTemplate;
 
-    public Notes createNote(String title, String content, String username){
-       Notes note = new Notes(title, content, username);
-       note = noteRepository.insert(note);
-        mongoTemplate.update(Notes.class)
-                            .matching(Criteria.where("username").is(username))
-                            .apply(new Update().push("_id").value(note.getId()))
-                            .first();
-
-        return note;
+    public Notes createNote(String title, String content, String username) {
+        Notes note = new Notes(title, content, username);
+        return noteRepository.insert(note);
     }
+    
 }
