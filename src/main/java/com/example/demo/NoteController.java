@@ -30,4 +30,19 @@ public class NoteController {
     public ResponseEntity<Notes> createNote(@RequestBody Map<String, String> payload){
         return new ResponseEntity<Notes>(noteService.createNote(payload.get("title"), payload.get("content"), payload.get("username")), HttpStatus.CREATED);
     }
+    @PostMapping("/")
+    public ResponseEntity<Notes> addNote(@RequestBody Notes note) {
+        return new ResponseEntity<>(noteService.addNote(note), HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Notes> updateNote(@PathVariable String id, @RequestBody Notes note) {
+        return new ResponseEntity<>(noteService.updateNote(id, note), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteNote(@PathVariable String id) {
+        noteService.deleteNoteById(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }

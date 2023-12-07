@@ -3,6 +3,7 @@ package com.example.demo;
 import java.util.List;
 import java.util.Optional;
 
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -34,5 +35,21 @@ public class NoteService {
         Notes note = new Notes(title, content, username);
         return noteRepository.insert(note);
     }
-    
+
+    //ta wersja dodawania jest jakas prostsza
+    public Notes addNote(Notes note) {
+        return noteRepository.save(note);
+    }
+
+
+    public Notes updateNote(String id, Notes note) {
+        note.setId(new ObjectId(id));
+        return noteRepository.save(note);
+    }
+
+    public void deleteNoteById(String id) {
+        noteRepository.deleteById(new ObjectId(id));
+    }
+
+
 }
