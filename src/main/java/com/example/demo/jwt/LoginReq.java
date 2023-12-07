@@ -1,6 +1,8 @@
 package com.example.demo.jwt;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
 
+@CrossOrigin(origins = {"http://localhost:8081","http://localhost:8080"})
 public class LoginReq {
     private String username;
     private String password;

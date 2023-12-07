@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
-
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.bson.types.ObjectId;
@@ -13,6 +13,7 @@ import org.bson.types.ObjectId;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@CrossOrigin(origins = {"http://localhost:8081","http://localhost:8080"})
 public class User {
     @Id
     private ObjectId id;

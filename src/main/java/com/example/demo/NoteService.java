@@ -8,9 +8,12 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 @Service
+@CrossOrigin(origins = {"http://localhost:8081","http://localhost:8080"})
 public class NoteService {
+    
     @Autowired
     private NoteRepository noteRepository;
     public List<Notes> allNotes(){

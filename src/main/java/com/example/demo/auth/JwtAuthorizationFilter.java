@@ -13,6 +13,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+@CrossOrigin(origins = {"http://localhost:8081","http://localhost:8080"})
 @Component
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
@@ -48,9 +50,10 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
             if (claims != null && jwtUtil.validateClaims(claims)) {
                 String username = claims.getSubject();
+                String password = claims.getSubject();
                 System.out.println("username: " + username);
                 Authentication authentication =
-                        new UsernamePasswordAuthenticationToken(username, "", new ArrayList<>());
+                        new UsernamePasswordAuthenticationToken(username, password, new ArrayList<>());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
 
@@ -60,6 +63,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             }
 
         } catch (Exception e) {
+            e.printStackTrace(); 
             errorDetails.put("message", "Authentication Error");
             errorDetails.put("details", e.getMessage());
             response.setStatus(HttpStatus.UNAUTHORIZED.value());

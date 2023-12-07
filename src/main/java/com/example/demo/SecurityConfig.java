@@ -10,11 +10,13 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import com.example.demo.auth.JwtAuthorizationFilter;
 
 @Configuration
 @EnableWebSecurity
+@CrossOrigin(origins = {"http://localhost:8081","http://localhost:8080"})
 public class SecurityConfig  {
 
     private final CustomUserDetailsService userDetailsService;

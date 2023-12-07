@@ -4,11 +4,13 @@ import io.jsonwebtoken.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+@CrossOrigin(origins = {"http://localhost:8081","http://localhost:8080"})
 @Component
 public class JwtUtil {
     private final String secret_key = "blablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablabla";
