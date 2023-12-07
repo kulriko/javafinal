@@ -51,5 +51,11 @@ public class NoteService {
         noteRepository.deleteById(new ObjectId(id));
     }
 
+    public Optional<Notes> findNoteById(String id) {
+        return noteRepository.findById(new ObjectId(id));
+    }
+    public void importNote(Notes importedNote) {
+        noteRepository.save(importedNote);
+    }
 
 }

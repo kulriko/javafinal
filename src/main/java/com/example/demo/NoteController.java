@@ -1,10 +1,16 @@
 package com.example.demo;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.io.IOException;
+import org.springframework.asm.TypeReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -16,6 +22,8 @@ public class NoteController {
 
     @Autowired 
     private NoteService noteService;
+    @Autowired
+    private ObjectMapper objectMapper;
     @GetMapping("/")
     public ResponseEntity<List<Notes>> getAllNotes(){
         return new ResponseEntity<List<Notes>>(noteService.allNotes(), HttpStatus.OK);
@@ -44,5 +52,26 @@ public class NoteController {
     public ResponseEntity<Void> deleteNote(@PathVariable String id) {
         noteService.deleteNoteById(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping("/{id}/export")
+    public ResponseEntity<String> exportNote(@PathVariable String id) throws Exception {
+        Optional<Notes> note = noteService.findNoteById(id);
+
+        if (note.isPresent()) {
+            String jsonNote = objectMapper.writeValueAsString(note.get());
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(jsonNote);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping("/import")
+    public ResponseEntity<Void> importNote(@RequestBody String jsonNote) throws Exception {
+        Notes importedNote = objectMapper.readValue(jsonNote, Notes.class);
+        noteService.importNote(importedNote);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }
