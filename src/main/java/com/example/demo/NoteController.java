@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/notes")
@@ -25,10 +26,16 @@ public class NoteController {
     @Autowired
     private ObjectMapper objectMapper;
     @GetMapping("/")
-    public ResponseEntity<List<Notes>> getAllNotes(){
-        return new ResponseEntity<List<Notes>>(noteService.allNotes(), HttpStatus.OK);
-        // System.out.println(noteService.allNotes().get(0).getContent());
-        // return new ResponseEntity<List<Notes>>(noteService.allNotes(), HttpStatus.OK);
+    public ResponseEntity<List<NoteDTO>> getAllNotes() {
+        List<Notes> notes = noteService.allNotes();
+        List<NoteDTO> noteDTOs = notes.stream()
+                .map(note -> new NoteDTO(
+                        note.getId().toString(),
+                        note.getTitle(),
+                        note.getContent(),
+                        note.getUsername()))
+                .collect(Collectors.toList());
+        return new ResponseEntity<>(noteDTOs, HttpStatus.OK);
     }
     @GetMapping("/{username}")
     public ResponseEntity<Optional<Notes>> getSingleNote(@PathVariable String username){

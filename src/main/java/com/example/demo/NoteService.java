@@ -42,10 +42,19 @@ public class NoteService {
     }
 
 
-    public Notes updateNote(String id, Notes note) {
-        note.setId(new ObjectId(id));
-        return noteRepository.save(note);
+    public Notes updateNote(String id, Notes updatedNote) {
+        Optional<Notes> existingNoteOptional = findNoteById(new String(id));
+            Notes existingNote = existingNoteOptional.get();
+    
+            // Update only the fields you want to modify
+            existingNote.setTitle(updatedNote.getTitle());
+            existingNote.setContent(updatedNote.getContent());
+    
+            // Save the updated note
+            return noteRepository.save(existingNote);
+
     }
+    
 
     public void deleteNoteById(String id) {
         noteRepository.deleteById(new ObjectId(id));
