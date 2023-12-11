@@ -1,13 +1,68 @@
 package com.example.demo;
 
+import com.example.demo.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-@SpringBootTest
-class DemoApplicationTests {
+@DataMongoTest
+@ExtendWith(SpringExtension.class)
+@AutoConfigureMockMvc
+public class DemoApplicationTests {
+
+	@Autowired
+	private MockMvc mockMvc;
+
+	@Autowired
+	private NoteRepository noteRepository;
+
+	@BeforeEach
+	public void setUp() {
+		// Dodaj przykładową notatkę do bazy danych przed każdym testem
+		Notes sampleNote = new Notes("Test Title", "Test Content", "testuser");
+		noteRepository.save(sampleNote);
+	}
+
+	@AfterEach
+	public void tearDown() {
+		// Wyczyść bazę danych po każdym teście
+		noteRepository.deleteAll();
+	}
 
 	@Test
-	void contextLoads() {
+	public void shouldReturnAllNotes() throws Exception {
+		mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/notes/"))
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(1));
 	}
+
+	@Test
+	public void shouldReturnNoteById() throws Exception {
+		Notes note = noteRepository.findAll().get(0);
+		mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/notes/" + note.getId()))
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(MockMvcResultMatchers.jsonPath("$.id").value(note.getId().toString()));
+	}
+
+	@Test
+	public void shouldCreateNote() throws Exception {
+		mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/notes/")
+						.content("{\"title\": \"New Note\", \"content\": \"New Content\", \"username\": \"testuser\"}")
+						.contentType("application/json"))
+				.andExpect(MockMvcResultMatchers.status().isCreated());
+
+		mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/notes/"))
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(2));
+	}
+
 
 }
