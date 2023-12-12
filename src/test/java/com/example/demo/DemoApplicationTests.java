@@ -1,34 +1,48 @@
 package com.example.demo;
 
-import com.example.demo.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-@DataMongoTest
+import java.util.Collections;
+
+import static org.mockito.Mockito.when;
+
 @ExtendWith(SpringExtension.class)
-@AutoConfigureMockMvc
+@WebMvcTest(controllers = NoteController.class)
+@Import(TestConfig.class)
 public class DemoApplicationTests {
 
 	@Autowired
 	private MockMvc mockMvc;
 
-	@Autowired
+	@MockBean
 	private NoteRepository noteRepository;
+
+	@Autowired
+	private ObjectMapper objectMapper;
 
 	@BeforeEach
 	public void setUp() {
 		// Dodaj przykładową notatkę do bazy danych przed każdym testem
 		Notes sampleNote = new Notes("Test Title", "Test Content", "testuser");
-		noteRepository.save(sampleNote);
+		when(noteRepository.save(sampleNote)).thenReturn(sampleNote);
+
+		// Pobierz notatkę po ID
+		when(noteRepository.findById(sampleNote.getId())).thenReturn(java.util.Optional.of(sampleNote));
+
+		// Pobierz wszystkie notatki
+		when(noteRepository.findAll()).thenReturn(Collections.singletonList(sampleNote));
 	}
 
 	@AfterEach
@@ -55,7 +69,7 @@ public class DemoApplicationTests {
 	@Test
 	public void shouldCreateNote() throws Exception {
 		mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/notes/")
-						.content("{\"title\": \"New Note\", \"content\": \"New Content\", \"username\": \"testuser\"}")
+						.content(objectMapper.writeValueAsString(new Notes("New Note", "New Content", "testuser")))
 						.contentType("application/json"))
 				.andExpect(MockMvcResultMatchers.status().isCreated());
 
@@ -63,6 +77,4 @@ public class DemoApplicationTests {
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(2));
 	}
-
-
 }
